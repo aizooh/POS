@@ -34,6 +34,13 @@ RUN composer install --no-dev --optimize-autoloader
 # Install and build frontend assets
 RUN npm install && npm run build
 
+# 👇 CREATE STORAGE DIRECTORIES BEFORE CHOWN
+RUN mkdir -p storage/framework/views \
+             storage/framework/cache \
+             storage/framework/sessions \
+             storage/logs \
+             bootstrap/cache
+
 # Set proper permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
