@@ -34,7 +34,7 @@ RUN composer install --no-dev --optimize-autoloader
 # Install and build frontend assets
 RUN npm install && npm run build
 
-# 👇 CREATE STORAGE DIRECTORIES BEFORE CHOWN
+# Create storage directories
 RUN mkdir -p storage/framework/views \
              storage/framework/cache \
              storage/framework/sessions \
@@ -46,16 +46,23 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
 # Configure Apache to serve Laravel
-RUN cat > /etc/apache2/sites-available/000-default.conf <<EOF
-<VirtualHost *:8080>
+RUN a2dissite 000-default.conf && a2ensite 000-default.conf
+
+# Override the default site configuration
+RUN echo '<VirtualHost *:8080>
+    ServerName localhost
     DocumentRoot /var/www/html/public
     <Directory /var/www/html/public>
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
     </Directory>
-</VirtualHost>
-EOF
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
+# Restart Apache (not needed in Docker, but ensure config is active)
+RUN a2ensite 000-default.conf
 
 # Expose port 8080
 EXPOSE 8080
