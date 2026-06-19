@@ -38,15 +38,17 @@ RUN npm install && npm run build
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Configure Apache to serve Laravel
-RUN echo '<VirtualHost *:8080>
+# Configure Apache to serve Laravel (using heredoc)
+RUN cat > /etc/apache2/sites-available/000-default.conf <<EOF
+<VirtualHost *:8080>
     DocumentRoot /var/www/html/public
     <Directory /var/www/html/public>
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
     </Directory>
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+</VirtualHost>
+EOF
 
 # Expose port 8080
 EXPOSE 8080
