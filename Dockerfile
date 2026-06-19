@@ -1,5 +1,5 @@
-# Use PHP 8.2 with Apache
-FROM php:8.2-apache
+# Use PHP 8.4 with Apache
+FROM php:8.4-apache
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -38,7 +38,7 @@ RUN npm install && npm run build
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Configure Apache to serve Laravel (using heredoc)
+# Configure Apache to serve Laravel
 RUN cat > /etc/apache2/sites-available/000-default.conf <<EOF
 <VirtualHost *:8080>
     DocumentRoot /var/www/html/public
