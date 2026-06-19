@@ -45,11 +45,9 @@ RUN mkdir -p storage/framework/views \
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Configure Apache to serve Laravel
-RUN a2dissite 000-default.conf && a2ensite 000-default.conf
-
-# Override the default site configuration
-RUN echo '<VirtualHost *:8080>
+# Configure Apache to serve Laravel (using heredoc with cat)
+RUN cat > /etc/apache2/sites-available/000-default.conf <<EOF
+<VirtualHost *:8080>
     ServerName localhost
     DocumentRoot /var/www/html/public
     <Directory /var/www/html/public>
@@ -57,12 +55,10 @@ RUN echo '<VirtualHost *:8080>
         AllowOverride All
         Require all granted
     </Directory>
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
-
-# Restart Apache (not needed in Docker, but ensure config is active)
-RUN a2ensite 000-default.conf
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+EOF
 
 # Expose port 8080
 EXPOSE 8080
