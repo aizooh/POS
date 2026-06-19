@@ -7,7 +7,7 @@
 
                 <div class="space-y-3">
                     <p><strong>SKU:</strong> {{ $accessory->sku ?? 'N/A' }}</p>
-                    <p><strong>Price:</strong> ${{ number_format($accessory->price, 2) }}</p>
+                    <p><strong>Price:</strong> Ksh.{{ number_format($accessory->price, 2) }}</p>
                     <p><strong>Stock:</strong> {{ $accessory->stock_quantity }}</p>
                     <p><strong>Description:</strong> {{ $accessory->description ?? 'No description' }}</p>
                     <p><strong>Created:</strong> {{ $accessory->created_at->format('Y-m-d H:i') }}</p>
