@@ -1,0 +1,66 @@
+# ---------- Stage 1: Build frontend assets ----------
+FROM node:22-alpine AS node-builder
+WORKDIR /var/www
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# ---------- Stage 2: Install PHP dependencies ----------
+FROM composer:latest AS composer-builder
+WORKDIR /var/www
+COPY . .
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+
+# ---------- Stage 3: Final runtime image ----------
+FROM php:8.4-fpm
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nginx \
+    supervisor \
+    curl \
+    unzip \
+    libpq-dev \
+    libonig-dev \
+    libssl-dev \
+    libxml2-dev \
+    libcurl4-openssl-dev \
+    libicu-dev \
+    libzip-dev \
+    && docker-php-ext-install -j$(nproc) \
+       pdo_mysql \
+       pdo_pgsql \
+       pgsql \
+       intl \
+       zip \
+       bcmath \
+       soap \
+    && apt-get autoremove -y && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+WORKDIR /var/www
+
+# App code + vendor (from composer stage) + built assets (from node stage)
+COPY . .
+COPY --from=composer-builder /var/www/vendor /var/www/vendor
+COPY --from=node-builder /var/www/public/build /var/www/public/build
+
+# Config files
+COPY docker/render/nginx.conf /etc/nginx/sites-available/default
+COPY docker/render/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/render/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+RUN chmod +x /usr/local/bin/entrypoint.sh \
+    && mkdir -p /var/www/storage/app/public \
+                /var/www/storage/framework/cache/data \
+                /var/www/storage/framework/sessions \
+                /var/www/storage/framework/testing \
+                /var/www/storage/framework/views \
+                /var/www/storage/logs \
+                /var/www/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+EXPOSE 80
+
+ENTRYPOINT ["entrypoint.sh"]
