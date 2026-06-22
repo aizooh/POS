@@ -8,15 +8,17 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('accessories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->integer('stock_quantity')->default(0);
-            $table->string('sku')->nullable()->unique();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('accessories')) {
+            Schema::create('accessories', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->decimal('price', 10, 2);
+                $table->integer('stock_quantity')->default(0);
+                $table->string('sku')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     public function down()
