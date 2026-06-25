@@ -45,9 +45,16 @@ RUN mkdir -p storage/framework/views \
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Configure Apache to serve Laravel (using heredoc with cat)
+# --- PORT CONFIGURATION ---
+# Set a default port in case the host doesn't provide one
+ENV PORT=8080
+
+# Update Apache's ports.conf to listen to the dynamic PORT variable
+RUN sed -i 's/Listen 80/Listen ${PORT}/g' /etc/apache2/ports.conf
+
+# Configure Apache VirtualHost to use the dynamic PORT
 RUN cat > /etc/apache2/sites-available/000-default.conf <<EOF
-<VirtualHost *:8080>
+<VirtualHost *:\${PORT}>
     ServerName localhost
     DocumentRoot /var/www/html/public
     <Directory /var/www/html/public>
@@ -60,8 +67,8 @@ RUN cat > /etc/apache2/sites-available/000-default.conf <<EOF
 </VirtualHost>
 EOF
 
-# Expose port 8080
-EXPOSE 8080
+# Expose the dynamic port
+EXPOSE ${PORT}
 
 # Start Apache
 CMD ["apache2-foreground"]
