@@ -15,6 +15,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'admin@pos.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
+            'pin'      => '1234', //
         ]);
 
         User::create([
@@ -22,6 +23,7 @@ class UsersTableSeeder extends Seeder
             'email' => 'attendant@pos.com',
             'password' => Hash::make('password'),
             'role' => 'attendant',
+            'pin'      => '1234', //
         ]);
     }
 }
