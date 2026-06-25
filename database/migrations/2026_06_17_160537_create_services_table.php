@@ -8,6 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
+        if (!Schema::hasTable('services')) {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -16,7 +17,7 @@ return new class extends Migration
             $table->integer('duration_minutes')->nullable(); // optional service duration
             $table->timestamps();
         });
-    }
+    } }
 
     public function down()
     {
