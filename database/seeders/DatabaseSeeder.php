@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         'email' => 'admin@mamicarpos.com',
         'password' => bcrypt('admin1234'),
         'role' => 'admin',
+        'pin' => '1234',
     ]);
 
     User::create([
@@ -27,6 +28,7 @@ class DatabaseSeeder extends Seeder
         'email' => 'attendant@mamicarpos.com',
         'password' => bcrypt('attend1234'),
         'role' => 'attendant',
+        'pin' => '1234',
     ]);
 }
 }
