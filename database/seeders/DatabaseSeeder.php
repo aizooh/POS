@@ -15,20 +15,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
 {
-    User::create([
-        'name' => 'Admin',
-        'email' => 'admin@mamicarpos.com',
-        'password' => bcrypt('admin1234'),
-        'role' => 'admin',
-        'pin' => '1234',
-    ]);
+    User::updateOrCreate(
+            ['email' => 'admin@pos.com'],[
+            'name' => 'Admin User',
+            'email' => 'admin@pos.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+            'pin'      => '1234', //
+        ]);
 
-    User::create([
-        'name' => 'Attendant',
-        'email' => 'attendant@mamicarpos.com',
-        'password' => bcrypt('attend1234'),
-        'role' => 'attendant',
-        'pin' => '1234',
-    ]);
+        User::updateOrCreate([
+            'email' => 'attendant@pos.com'
+        ],[
+            'name' => 'Attendant User',
+            'email' => 'attendant@pos.com',
+            'password' => Hash::make('password'),
+            'role' => 'attendant',
+            'pin'      => '1234', //
+        ]);
 }
 }
