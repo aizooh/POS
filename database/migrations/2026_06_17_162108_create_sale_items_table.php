@@ -8,22 +8,24 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('expenses', function (Blueprint $table) {
+        Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->string('category'); // rent, salaries, utilities, etc.
-            $table->text('description')->nullable();
-            $table->decimal('amount', 10, 2);
-            $table->date('expense_date');
-            $table->string('payment_method')->default('cash');
-            $table->string('receipt')->nullable(); // store file path
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // attendant who made sale
+            $table->string('invoice_number')->unique();
+            $table->decimal('subtotal', 10, 2)->default(0);
+            $table->decimal('tax', 10, 2)->default(0);
+            $table->decimal('discount', 10, 2)->default(0);
+            $table->decimal('total_amount', 10, 2);
+            $table->string('payment_method')->default('cash'); // cash, card, mpesa
+            $table->string('payment_status')->default('paid');
+            $table->timestamp('sale_date')->useCurrent();
             $table->text('notes')->nullable();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // who recorded it
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('expenses');
+        Schema::dropIfExists('sales');
     }
 };
